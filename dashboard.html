@@ -1,0 +1,576 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script> window.FontAwesomeConfig = { autoReplaceSvg: 'nest'};</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <!-- Bing Maps SDK -->
+    <script type='text/javascript' src='https://www.bing.com/api/maps/mapcontrol?callback=initBingMap' async defer></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        inter: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        'primary': '#067D87',
+                        'primary-dark': '#B91C1C',
+                        'secondary': '#EA580C',
+                        'accent': '#F59E0B',
+                        'success': '#10B981',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar { display: none;}
+        body { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Garante que o mapa nÃ£o sobreponha outros elementos */
+        #map-container {
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Estilo para o Bing Maps */
+        .MicrosoftMap {
+            width: 100% !important;
+            height: 100% !important;
+        }
+        
+        /* Ajustes para telas muito pequenas */
+        @media (max-width: 380px) {
+            .text-responsive {
+                font-size: 0.875rem;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-inter min-h-screen">
+
+    <!-- Mobile Menu Overlay -->
+    <div id="mobile-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden lg:hidden" onclick="toggleMobileSidebar()"></div>
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="fixed left-0 top-0 w-64 sm:w-72 h-screen bg-white border-r border-gray-200 shadow-xl z-40 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 overflow-y-auto">
+        <div class="p-4 sm:p-6">
+            <div class="flex items-center justify-between mb-6 sm:mb-8">
+                <div class="flex items-center space-x-2 sm:space-x-3">
+                    <div>
+                        <h1 class="text-xl sm:text-2xl font-bold text-gray-900">Alerta Recife</h1>
+                        <p class="text-xs sm:text-sm text-gray-500">Sistema de Deteção</p>
+                    </div>
+                </div>
+                <button class="lg:hidden text-gray-600 hover:text-gray-900 p-2" onclick="toggleMobileSidebar()">
+                    <i class="fa-solid fa-times text-xl"></i>
+                </button>
+            </div>
+            <nav class="space-y-2 sm:space-y-3">
+                <!-- Mapa -->
+                <div class="flex items-center space-x-3 sm:space-x-4 px-3 sm:px-4 py-3 sm:py-4 rounded-xl bg-[#067D87] text-white cursor-pointer shadow-lg">
+                    <i class="fa-solid fa-map text-base sm:text-lg"></i>
+                    <span class="font-semibold text-sm sm:text-base">Mapa</span>
+                </div>
+
+                <!-- Dados -->
+                <a href="dado.html" class="flex items-center space-x-3 sm:space-x-4 px-3 sm:px-4 py-3 sm:py-4 rounded-xl text-gray-600 hover:bg-gray-100 transition-colors">
+                    <i class="fa-solid fa-database text-base sm:text-lg"></i>
+                    <span class="font-medium text-sm sm:text-base">Dados</span>
+                </a>
+
+                <!-- CÃ¢meras -->
+                <a href="camera.html" class="flex items-center space-x-3 sm:space-x-4 px-3 sm:px-4 py-3 sm:py-4 rounded-xl text-gray-600 hover:bg-gray-100 transition-colors">
+                    <i class="fa-solid fa-camera text-base sm:text-lg"></i>
+                    <span class="font-medium text-sm sm:text-base">Câmeras</span>
+                </a>
+
+                <!-- HistÃ³rico -->
+                <a href="historico.html" class="flex items-center space-x-3 sm:space-x-4 px-3 sm:px-4 py-3 sm:py-4 rounded-xl text-gray-600 hover:bg-gray-100 transition-colors">
+                    <i class="fa-solid fa-clock-rotate-left text-base sm:text-lg"></i>
+                    <span class="font-medium text-sm sm:text-base">Histórico</span>
+                </a>
+            </nav>
+        </div>
+        <div class="absolute bottom-4 sm:bottom-6 left-4 sm:left-6 right-4 sm:right-6">
+            <div class="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-xl p-3 sm:p-4 border border-primary/20">
+                <div class="flex items-center space-x-2 sm:space-x-3">
+                    <div class="w-2.5 h-2.5 sm:w-3 sm:h-3 bg-success rounded-full animate-pulse"></div>
+                    <span class="text-xs sm:text-sm font-medium text-gray-700">Sistema Ativo</span>
+                </div>
+                <p class="text-xs text-gray-500 mt-1">Monitoramento em tempo real</p>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="lg:ml-72">
+        <!-- Header -->
+        <header id="header" class="bg-white border-b border-gray-200 px-3 sm:px-6 lg:px-8 py-3 sm:py-4 lg:py-5 shadow-sm sticky top-0 z-20">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-2 sm:space-x-4 flex-1 min-w-0">
+                    <!-- Mobile Menu Button -->
+                    <button class="lg:hidden text-gray-600 hover:text-gray-900 p-2 -ml-2" onclick="toggleMobileSidebar()">
+                        <i class="fa-solid fa-bars text-lg sm:text-xl"></i>
+                    </button>
+                    <div class="min-w-0 flex-1">
+                        <h2 class="text-base sm:text-xl lg:text-2xl xl:text-3xl font-bold text-gray-900 truncate">Histórico de Acidentes</h2>
+                        <p class="text-xs sm:text-sm text-gray-500 mt-0.5 sm:mt-1 hidden sm:block">Registro completo de ocorréncias detectadas</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-2 sm:space-x-4 lg:space-x-6 flex-shrink-0">
+                    <div class="relative">
+                        <i class="fa-regular fa-bell text-base sm:text-lg lg:text-xl text-gray-600 cursor-pointer hover:text-primary transition-colors"></i>
+                        <span class="absolute -top-1 -right-1 sm:-top-2 sm:-right-2 w-3.5 h-3.5 sm:w-4 sm:h-4 lg:w-5 lg:h-5 bg-primary text-white text-[10px] sm:text-xs rounded-full flex items-center justify-center font-semibold">3</span>
+                    </div>
+                    <div class="relative">
+                        <div class="flex items-center space-x-1 sm:space-x-2 lg:space-x-3 cursor-pointer" onclick="toggleProfileMenu()">
+                            <img src="https://www.publicdomainpictures.net/pictures/180000/velka/cat-1464103447LmK.jpg" class="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 rounded-full border-2 border-primary shadow-md" alt="User Avatar">
+                            <div class="hidden md:block">
+                                <p class="font-semibold text-gray-900 text-xs lg:text-sm">Lorena</p>
+                                <p class="text-xs text-gray-500">Governo</p>
+                            </div>
+                            <i class="fa-solid fa-chevron-down text-gray-400 text-xs hidden md:block"></i>
+                        </div>
+                        
+                        <!-- Profile Menu Dropdown -->
+                        <div id="profile-menu" class="absolute right-0 top-full mt-2 w-48 sm:w-56 lg:w-64 bg-white rounded-xl shadow-xl border border-gray-200 py-2 z-50 hidden">
+                            <div class="px-3 sm:px-4 py-2 sm:py-3 border-b border-gray-100">
+                                <p class="font-semibold text-gray-900 text-sm sm:text-base">Ana Silva</p>
+                                <p class="text-xs sm:text-sm text-gray-500 truncate">ana.silva@recife.gov.br</p>
+                            </div>
+                            
+                            <div class="py-2">
+                                <a href="perfil.html" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors">
+    <i class="fa-solid fa-gear text-gray-500 w-5"></i>
+    <span class="ml-3 font-medium">Meu Perfil</span>
+</a>
+                                
+                                <a href="alterar-foto.html" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors">
+    <i class="fa-solid fa-gear text-gray-500 w-5"></i>
+    <span class="ml-3 font-medium">Alterar Foto</span>
+</a>
+                                
+                                <a href="alterar-senha.html" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors">
+    <i class="fa-solid fa-gear text-gray-500 w-5"></i>
+    <span class="ml-3 font-medium">Alterar Senha</span>
+                                
+                                <a href="configuracoes.html" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors">
+    <i class="fa-solid fa-gear text-gray-500 w-5"></i>
+    <span class="ml-3 font-medium">Configurações</span>
+</a>
+
+                                
+                                <div class="border-t border-gray-100 mt-2 pt-2">
+                                    <a href="index.html" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors">
+   
+ <span class="ml-3 font-medium">Fazer login</span>
+</a>
+                                    
+                                    <a href="index.html" class="flex items-center px-4 py-3 text-red-600 hover:bg-red-50 transition-colors cursor-pointer">
+                                        <i class="fa-solid fa-sign-out-alt text-red-500 w-5"></i>
+                                        <span class="ml-3 font-medium">Sair</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- History Main Content -->
+        <main class="p-3 sm:p-4 md:p-6 lg:p-8">
+            <!-- Map Section -->
+            <section id="map-overview-section" class="mb-4 sm:mb-6 lg:mb-8">
+                <div class="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-4 md:p-6 shadow-sm border border-gray-200">
+                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-3 sm:mb-4 md:mb-6 space-y-3 sm:space-y-0">
+                        <div>
+                            <h3 class="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900">Mapa de Risco - Recife</h3>
+                            <button onclick="toggleTraffic()" class="mt-2 text-xs sm:text-sm text-primary hover:text-primary-dark font-medium flex items-center space-x-1">
+                                <i class="fa-solid fa-traffic-light"></i>
+                                <span>Alternar Tráfego</span>
+                            </button>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-2 sm:gap-3 md:gap-4">
+                            <div class="flex items-center space-x-1.5 sm:space-x-2">
+                                <div class="w-2.5 h-2.5 sm:w-3 sm:h-3 md:w-4 md:h-4 bg-primary rounded-full"></div>
+                                <span class="text-xs sm:text-sm text-gray-600 whitespace-nowrap">Alto Risco</span>
+                            </div>
+                            <div class="flex items-center space-x-1.5 sm:space-x-2">
+                                <div class="w-2.5 h-2.5 sm:w-3 sm:h-3 md:w-4 md:h-4 bg-secondary rounded-full"></div>
+                                <span class="text-xs sm:text-sm text-gray-600 whitespace-nowrap">Médio Risco</span>
+                            </div>
+                            <div class="flex items-center space-x-1.5 sm:space-x-2">
+                                <div class="w-2.5 h-2.5 sm:w-3 sm:h-3 md:w-4 md:h-4 bg-accent rounded-full"></div>
+                                <span class="text-xs sm:text-sm text-gray-600 whitespace-nowrap">Baixo Risco</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="relative w-full">
+                        <div id="map-container" class="w-full h-64 sm:h-80 md:h-96 lg:h-[450px] rounded-lg sm:rounded-xl overflow-hidden border border-gray-200 z-0"></div>
+                        <div class="absolute bottom-2 sm:bottom-3 md:bottom-4 right-2 sm:right-3 md:right-4 bg-white/90 backdrop-blur-sm rounded-lg p-1.5 sm:p-2 shadow-lg z-10">
+                            <i class="fa-solid fa-expand text-gray-600 cursor-pointer hover:text-primary text-xs sm:text-sm md:text-base"></i>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Chart Section -->
+            <section class="mb-4 sm:mb-6 lg:mb-8">
+                <div class="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-4 md:p-6 shadow-sm border border-gray-200">
+                    <div id="incident-chart-container" class="h-64 sm:h-80 md:h-96 lg:h-[400px]"></div>
+                </div>
+            </section>
+
+            <!-- Status Info -->
+            <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
+                <div class="bg-gradient-to-br from-primary/5 to-primary/10 rounded-xl sm:rounded-2xl p-4 sm:p-5 md:p-6 border border-primary/20">
+                    <div class="flex items-center justify-between mb-2 sm:mb-3">
+                        <i class="fa-solid fa-triangle-exclamation text-2xl sm:text-3xl lg:text-4xl text-primary"></i>
+                        <span class="text-xs sm:text-sm font-semibold text-primary bg-primary/10 px-2 sm:px-3 py-1 rounded-full">Alto</span>
+                    </div>
+                    <h4 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-1">23</h4>
+                    <p class="text-xs sm:text-sm text-gray-600">Acidentes Graves</p>
+                </div>
+
+                <div class="bg-gradient-to-br from-secondary/5 to-secondary/10 rounded-xl sm:rounded-2xl p-4 sm:p-5 md:p-6 border border-secondary/20">
+                    <div class="flex items-center justify-between mb-2 sm:mb-3">
+                        <i class="fa-solid fa-exclamation-circle text-2xl sm:text-3xl lg:text-4xl text-secondary"></i>
+                        <span class="text-xs sm:text-sm font-semibold text-secondary bg-secondary/10 px-2 sm:px-3 py-1 rounded-full">MÃ©dio</span>
+                    </div>
+                    <h4 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-1">47</h4>
+                    <p class="text-xs sm:text-sm text-gray-600">Acidentes Moderados</p>
+                </div>
+
+                <div class="bg-gradient-to-br from-accent/5 to-accent/10 rounded-xl sm:rounded-2xl p-4 sm:p-5 md:p-6 border border-accent/20 sm:col-span-2 lg:col-span-1">
+                    <div class="flex items-center justify-between mb-2 sm:mb-3">
+                        <i class="fa-solid fa-info-circle text-2xl sm:text-3xl lg:text-4xl text-accent"></i>
+                        <span class="text-xs sm:text-sm font-semibold text-accent bg-accent/10 px-2 sm:px-3 py-1 rounded-full">Baixo</span>
+                    </div>
+                    <h4 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-1">89</h4>
+                    <p class="text-xs sm:text-sm text-gray-600">Acidentes Leves</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // Mobile sidebar toggle
+        function toggleMobileSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('mobile-overlay');
+            
+            sidebar.classList.toggle('-translate-x-full');
+            overlay.classList.toggle('hidden');
+        }
+
+        // Profile menu toggle functionality
+        function toggleProfileMenu() {
+            const profileMenu = document.getElementById('profile-menu');
+            profileMenu.classList.toggle('hidden');
+        }
+
+        // Close profile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const profileMenu = document.getElementById('profile-menu');
+            const profileButton = event.target.closest('[onclick="toggleProfileMenu()"]');
+            
+            if (!profileButton && !profileMenu.contains(event.target)) {
+                profileMenu.classList.add('hidden');
+            }
+        });
+
+        // Close mobile sidebar when clicking a link
+        document.querySelectorAll('#sidebar a').forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth < 1024) {
+                    toggleMobileSidebar();
+                }
+            });
+        });
+
+        // Highcharts configuration with responsive design
+        document.addEventListener('DOMContentLoaded', function () {
+            const isMobile = window.innerWidth < 640;
+            const isTablet = window.innerWidth >= 640 && window.innerWidth < 1024;
+            
+            Highcharts.chart('incident-chart-container', {
+                chart: {
+                    type: 'spline',
+                    backgroundColor: 'transparent',
+                    height: null,
+                },
+                title: {
+                    text: 'Acidentes nas Ãšltimas 24 Horas',
+                    align: 'left',
+                    style: {
+                        color: '#1F2937',
+                        fontSize: isMobile ? '14px' : isTablet ? '16px' : '20px',
+                        fontWeight: '700'
+                    }
+                },
+                subtitle: {
+                    text: 'DetecÃ§Ã£o automÃ¡tica em tempo real',
+                    align: 'left',
+                    style: {
+                        color: '#6B7280',
+                        fontSize: isMobile ? '11px' : isTablet ? '12px' : '14px'
+                    }
+                },
+                credits: {
+                    enabled: false
+                },
+                xAxis: {
+                    categories: ['00:00', '03:00', '06:00', '09:00', '12:00', '15:00', '18:00', '21:00'],
+                    labels: {
+                        style: {
+                            color: '#6B7280',
+                            fontSize: isMobile ? '9px' : isTablet ? '10px' : '12px',
+                            fontWeight: '500'
+                        }
+                    },
+                    lineColor: '#E5E7EB',
+                    tickColor: '#E5E7EB'
+                },
+                yAxis: {
+                    title: {
+                        text: isMobile ? 'OcorrÃªncias' : 'Número de Ocorrências',
+                        style: {
+                            color: '#6B7280',
+                            fontSize: isMobile ? '10px' : isTablet ? '11px' : '13px',
+                            fontWeight: '500'
+                        }
+                    },
+                    labels: {
+                        style: {
+                            color: '#6B7280',
+                            fontSize: isMobile ? '9px' : isTablet ? '10px' : '12px'
+                        }
+                    },
+                    gridLineColor: '#F3F4F6'
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                    borderColor: '#067D87',
+                    borderRadius: 8,
+                    shadow: true,
+                    style: {
+                        color: '#1F2937',
+                        fontSize: isMobile ? '11px' : '13px'
+                    },
+                    shared: true,
+                    valueSuffix: ' acidentes'
+                },
+                legend: {
+                    enabled: true,
+                    align: isMobile ? 'center' : 'right',
+                    verticalAlign: isMobile ? 'bottom' : 'top',
+                    itemStyle: {
+                        color: '#6B7280',
+                        fontSize: isMobile ? '10px' : isTablet ? '11px' : '12px',
+                        fontWeight: '500'
+                    }
+                },
+                plotOptions: {
+                    spline: {
+                        marker: {
+                            enabled: true,
+                            symbol: 'circle',
+                            radius: isMobile ? 2.5 : isTablet ? 3 : 4,
+                            states: {
+                                hover: {
+                                    enabled: true,
+                                    radius: isMobile ? 4 : isTablet ? 5 : 6
+                                }
+                            }
+                        },
+                        lineWidth: isMobile ? 2 : isTablet ? 2.5 : 3
+                    }
+                },
+                responsive: {
+                    rules: [{
+                        condition: {
+                            maxWidth: 640
+                        },
+                        chartOptions: {
+                            legend: {
+                                layout: 'horizontal',
+                                align: 'center',
+                                verticalAlign: 'bottom'
+                            }
+                        }
+                    }]
+                },
+                series: [{
+                    name: 'Graves',
+                    data: [1, 0, 3, 5, 7, 4, 2, 1],
+                    color: '#067D87',
+                    marker: {
+                        fillColor: '#067D87'
+                    }
+                }, {
+                    name: 'Moderados',
+                    data: [2, 1, 4, 6, 8, 5, 3, 2],
+                    color: '#EA580C',
+                    marker: {
+                        fillColor: '#EA580C'
+                    }
+                }, {
+                    name: 'Leves',
+                    data: [3, 2, 5, 8, 12, 7, 4, 3],
+                    color: '#F59E0B',
+                    marker: {
+                        fillColor: '#F59E0B'
+                    }
+                }]
+            });
+
+            // Reflow chart on window resize
+            let resizeTimer;
+            window.addEventListener('resize', function() {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(function() {
+                    location.reload();
+                }, 250);
+            });
+        });
+
+        // Bing Maps Configuration
+        let bingMap;
+        
+        function initBingMap() {
+            // IMPORTANTE: Substitua 'SUA_CHAVE_AQUI' pela sua chave do Bing Maps
+            const BING_MAPS_KEY = 'SUA_CHAVE_AQUI';
+            
+            if (!Microsoft || !Microsoft.Maps) {
+                console.error('Bing Maps SDK não carregado');
+                return;
+            }
+
+            // ConfiguraÃ§Ã£o do mapa
+            bingMap = new Microsoft.Maps.Map('#map-container', {
+                credentials: BING_MAPS_KEY,
+                center: new Microsoft.Maps.Location(-8.05, -34.9),
+                zoom: window.innerWidth < 640 ? 11 : 12,
+                mapTypeId: Microsoft.Maps.MapTypeId.road,
+                showDashboard: window.innerWidth >= 768,
+                showZoomButtons: window.innerWidth >= 640,
+                showMapTypeSelector: window.innerWidth >= 768,
+                showScalebar: true,
+                showTermsLink: false,
+                disableScrollWheelZoom: window.innerWidth < 640,
+                navigationBarMode: window.innerWidth >= 640 ? 
+                    Microsoft.Maps.NavigationBarMode.default : 
+                    Microsoft.Maps.NavigationBarMode.compact
+            });
+
+            // Aguarda o mapa carregar completamente
+            Microsoft.Maps.Events.addHandler(bingMap, 'viewchangeend', function() {
+                addMarkers();
+            });
+
+            // Adiciona camada de trÃ¡fego
+            addTrafficLayer();
+        }
+
+        function addMarkers() {
+            if (!bingMap) return;
+
+            const ocorrencias = [
+                { 
+                    tipo: "Grave", 
+                    local: "Boa Viagem", 
+                    coords: new Microsoft.Maps.Location(-8.125, -34.915), 
+                    cor: '#067D87',
+                    icone: 'ðŸš¨'
+                },
+                { 
+                    tipo: "Moderado", 
+                    local: "Afogados", 
+                    coords: new Microsoft.Maps.Location(-8.081, -34.918), 
+                    cor: '#EA580C',
+                    icone: 'âš ï¸'
+                },
+                { 
+                    tipo: "Leve", 
+                    local: "Imbiribeira", 
+                    coords: new Microsoft.Maps.Location(-8.100, -34.900), 
+                    cor: '#F59E0B',
+                    icone: 'â„¹ï¸'
+                }
+            ];
+
+            ocorrencias.forEach(function(o) {
+                // Cria pin customizado
+                const pin = new Microsoft.Maps.Pushpin(o.coords, {
+                    title: o.tipo,
+                    subTitle: o.local,
+                    text: o.icone,
+                    color: o.cor
+                });
+
+                // Cria infobox
+                const infobox = new Microsoft.Maps.Infobox(o.coords, {
+                    title: o.tipo,
+                    description: o.local,
+                    visible: false
+                });
+                
+                infobox.setMap(bingMap);
+
+                // Evento de clique no pin
+                Microsoft.Maps.Events.addHandler(pin, 'click', function() {
+                    infobox.setOptions({ visible: true });
+                });
+
+                // Adiciona o pin ao mapa
+                bingMap.entities.push(pin);
+            });
+        }
+
+        function addTrafficLayer() {
+            if (!bingMap) return;
+
+            Microsoft.Maps.loadModule('Microsoft.Maps.Traffic', function() {
+                const trafficManager = new Microsoft.Maps.Traffic.TrafficManager(bingMap);
+                // Mostra camada de trÃ¡fego
+                trafficManager.show();
+            });
+        }
+
+        function toggleTraffic() {
+            if (!bingMap) return;
+            
+            Microsoft.Maps.loadModule('Microsoft.Maps.Traffic', function() {
+                const trafficManager = new Microsoft.Maps.Traffic.TrafficManager(bingMap);
+                trafficManager.toggle();
+            });
+        }
+
+        // Ajusta o mapa ao redimensionar a janela
+        let mapResizeTimer;
+        window.addEventListener('resize', function() {
+            clearTimeout(mapResizeTimer);
+            mapResizeTimer = setTimeout(function() {
+                if (bingMap) {
+                    bingMap.setView({
+                        zoom: window.innerWidth < 640 ? 11 : 12
+                    });
+                }
+            }, 250);
+        });
+    </script>
+
+</body>
+</html>
+
+

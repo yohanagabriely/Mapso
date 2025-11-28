@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script> window.FontAwesomeConfig = { autoReplaceSvg: 'nest'};</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        inter: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        'primary': '#067D87',
+                        'primary-dark': '#B91C1C',
+                        'secondary': '#EA580C',
+                        'accent': '#F59E0B',
+                        'success': '#10B981',
+                        'neutral-800': '#F9FAFB',
+                        'neutral-700': '#F3F4F6',
+                        'neutral-600': '#E5E7EB',
+                        'neutral-500': '#6B7280',
+                        'neutral-400': '#9CA3AF',
+                        'neutral-300': '#D1D5DB',
+                        'neutral-200': '#E5E7EB',
+                        'neutral-100': '#1F2937',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        ::-webkit-scrollbar { display: none;}
+        body { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-gray-50 font-inter min-h-screen">
+
+   <!-- Mobile Menu Button -->
+    <button id="mobile-menu-btn" class="lg:hidden fixed top-4 left-4 z-50 bg-white p-3 rounded-xl shadow-lg border border-gray-200">
+        <i class="fa-solid fa-bars text-xl text-gray-700"></i>
+    </button>
+
+    <!-- Overlay -->
+    <div id="overlay" class="fixed inset-0 bg-black/50 z-30 hidden lg:hidden"></div>
+
+   <!-- Sidebar -->
+    <aside id="sidebar" class="fixed left-0 top-0 w-72 h-screen bg-white border-r border-gray-200 shadow-xl z-40 transform -translate-x-full lg:translate-x-0 transition-transform duration-300">
+        <div class="p-6">
+            <div class="flex items-center justify-between mb-8">
+                <div class="flex items-center space-x-3">
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-900">Alerta Recife</h1>
+                        <p class="text-sm text-gray-500">Sistema de Detecção</p>
+                    </div>
+                </div>
+                <button id="close-sidebar" class="lg:hidden text-gray-500 hover:text-gray-700">
+                    <i class="fa-solid fa-times text-xl"></i>
+                </button>
+            </div>
+            
+        <nav class="space-y-3">
+            <a href="dashboard.html" class="flex items-center space-x-4 px-4 py-4 rounded-xl text-gray-600 hover:bg-gray-100 cursor-pointer transition-colors">
+                <i class="fa-solid fa-map text-lg"></i>
+                <span class="font-medium">Mapa</span>
+            </a>
+
+            <a href="dado.html" class="flex items-center space-x-4 px-4 py-4 rounded-xl text-gray-600 hover:bg-gray-100 cursor-pointer transition-colors">
+                <i class="fa-solid fa-database text-lg"></i>
+                <span class="font-medium">Dados</span>
+            </a>
+
+            <div class="flex items-center space-x-4 px-4 py-4 rounded-xl bg-[#067D87] text-white cursor-pointer shadow-lg">
+                <i class="fa-solid fa-camera text-lg"></i>
+                <span class="font-semibold">Câmeras</span>
+            </div>
+
+           <a href="historico.html" class="flex items-center space-x-4 px-4 py-4 rounded-xl text-gray-600 hover:bg-gray-100 transition-colors">
+                <i class="fa-solid fa-clock-rotate-left text-lg"></i>
+                <span class="font-medium">Histórico</span>
+            </a>
+        </nav>
+
+        </div>
+        <div class="absolute bottom-6 left-6 right-6">
+            <div class="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-xl p-4 border border-primary/20">
+                <div class="flex items-center space-x-3">
+                    <div class="w-3 h-3 bg-success rounded-full animate-pulse"></div>
+                    <span class="text-sm font-medium text-gray-700">Sistema Ativo</span>
+                </div>
+                <p class="text-xs text-gray-500 mt-1">Monitoramento em tempo real</p>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="lg:ml-72">
+        <!-- Header -->
+        <header id="header" class="bg-white border-b border-gray-200 px-4 sm:px-6 lg:px-8 py-4 lg:py-5 shadow-sm">
+            <div class="flex justify-between items-center">
+                <div class="ml-12 lg:ml-0">
+                    <h2 class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">Câmeras</h2>
+                    <p class="text-gray-500 mt-1 text-sm sm:text-base hidden sm:block">Monitoramento em tempo real</p>
+                </div>
+                <div class="flex items-center space-x-3 sm:space-x-6">
+                    <div class="relative hidden sm:block">
+                        <i class="fa-regular fa-bell text-xl text-gray-600 cursor-pointer hover:text-primary transition-colors"></i>
+                        <span class="absolute -top-2 -right-2 w-5 h-5 bg-primary text-white text-xs rounded-full flex items-center justify-center">3</span>
+                    </div>
+                    <div class="relative">
+                        <div class="flex items-center space-x-2 sm:space-x-3 cursor-pointer" onclick="toggleProfileMenu()">
+                            <img src="https://www.publicdomainpictures.net/pictures/180000/velka/cat-1464103447LmK.jpg" class="w-10 h-10 sm:w-12 sm:h-12 rounded-full border-3 border-primary shadow-md" alt="User Avatar">
+                            <div class="hidden sm:block">
+                                <p class="font-semibold text-gray-900">lorena</p>
+                                <p class="text-sm text-gray-500">governo</p>
+                            </div>
+                            <i class="fa-solid fa-chevron-down text-gray-400 text-sm hidden sm:block"></i>
+                        </div>
+                        
+                        <!-- Profile Menu Dropdown -->
+                        <div id="profile-menu" class="absolute right-0 top-full mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-200 py-2 z-50 hidden">
+                            <div class="px-4 py-3 border-b border-gray-100">
+                                <p class="font-semibold text-gray-900">Ana Silva</p>
+                                <p class="text-sm text-gray-500">ana.silva@recife.gov.br</p>
+                            </div>
+                            
+                            <div class="py-2">
+                                <a href="perfil.html" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors">
+    <i class="fa-solid fa-gear text-gray-500 w-5"></i>
+    <span class="ml-3 font-medium">Meu Perfil</span>
+</a>
+                                
+                                <a href="alterar-foto.html" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors">
+    <i class="fa-solid fa-gear text-gray-500 w-5"></i>
+    <span class="ml-3 font-medium">Alterar Foto</span>
+</a>
+                                
+                                <a href="alterar-senha.html" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors">
+    <i class="fa-solid fa-gear text-gray-500 w-5"></i>
+    <span class="ml-3 font-medium">Alterar Senha</span>
+                                
+                                <a href="configuracoes.html" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors">
+    <i class="fa-solid fa-gear text-gray-500 w-5"></i>
+    <span class="ml-3 font-medium">Configurações</span>
+</a>
+
+                                
+                                <div class="border-t border-gray-100 mt-2 pt-2">
+                                    <a href="index.html" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors">
+   
+ <span class="ml-3 font-medium">Fazer login</span>
+</a>
+                                    
+                                    <a href="index.html" class="flex items-center px-4 py-3 text-red-600 hover:bg-red-50 transition-colors cursor-pointer">
+                                        <i class="fa-solid fa-sign-out-alt text-red-500 w-5"></i>
+                                        <span class="ml-3 font-medium">Sair</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <!-- History Main Content -->
+        <main class="p-4 sm:p-6 lg:p-8">
+
+    <!-- Camera Stats -->
+    <section id="camera-stats" class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-6 lg:mb-8">
+        <div class="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-200">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-500 text-xs sm:text-sm font-medium">Câmeras Ativas</p>
+                    <p class="text-2xl sm:text-3xl font-bold text-gray-900 mt-2">247</p>
+                </div>
+                <div class="w-10 h-10 sm:w-14 sm:h-14 bg-success/10 rounded-xl flex items-center justify-center">
+                    <i class="fa-solid fa-video text-lg sm:text-2xl text-success"></i>
+                </div>
+            </div>
+            <p class="text-xs sm:text-sm text-success mt-2 sm:mt-4">+12 esta semana</p>
+        </div>
+
+        <div class="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-200">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-500 text-xs sm:text-sm font-medium">Gravações Hoje</p>
+                    <p class="text-2xl sm:text-3xl font-bold text-primary mt-2">34</p>
+                </div>
+                <div class="w-10 h-10 sm:w-14 sm:h-14 bg-primary/10 rounded-xl flex items-center justify-center">
+                    <i class="fa-solid fa-record-vinyl text-lg sm:text-2xl text-primary"></i>
+                </div>
+            </div>
+            <p class="text-xs sm:text-sm text-gray-500 mt-2 sm:mt-4">Últimas 24h</p>
+        </div>
+
+        <div class="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-200">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-500 text-xs sm:text-sm font-medium">Armazenamento</p>
+                    <p class="text-2xl sm:text-3xl font-bold text-secondary mt-2">2.4TB</p>
+                </div>
+                <div class="w-10 h-10 sm:w-14 sm:h-14 bg-secondary/10 rounded-xl flex items-center justify-center">
+                    <i class="fa-solid fa-database text-lg sm:text-2xl text-secondary"></i>
+                </div>
+            </div>
+            <p class="text-xs sm:text-sm text-gray-500 mt-2 sm:mt-4">78% utilizado</p>
+        </div>
+
+        <div class="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-200">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-500 text-xs sm:text-sm font-medium">Qualidade Média</p>
+                    <p class="text-2xl sm:text-3xl font-bold text-accent mt-2">4K</p>
+                </div>
+                <div class="w-10 h-10 sm:w-14 sm:h-14 bg-accent/10 rounded-xl flex items-center justify-center">
+                    <i class="fa-solid fa-eye text-lg sm:text-2xl text-accent"></i>
+                </div>
+            </div>
+            <p class="text-xs sm:text-sm text-gray-500 mt-2 sm:mt-4">Ultra HD</p>
+        </div>
+    </section>
+
+    <!-- Camera Recordings Grid -->
+    <section id="camera-recordings" class="bg-white rounded-2xl shadow-sm border border-gray-200">
+        <div class="p-4 sm:p-6 border-b border-gray-200">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <h3 class="text-lg sm:text-xl font-bold text-gray-900">Transmissão ao Vivo & Gravações</h3>
+
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center space-y-2 sm:space-y-0 sm:space-x-3 w-full sm:w-auto">
+                    <select class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary w-full sm:w-auto">
+                        <option>Todas as câmeras</option>
+                        <option>Centro</option>
+                        <option>Boa Viagem</option>
+                        <option>Imbiribeira</option>
+                    </select>
+
+                    <button class="bg-[#067D87] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#05666f] transition-colors w-full sm:w-auto">
+                        <i class="fa-solid fa-download mr-2"></i>Baixar Selecionadas
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="p-4 sm:p-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
+
+                <!-- ========================= -->
+                <!--   CÂMERA AO VIVO AQUI     -->
+                <!-- ========================= -->
+                <div class="bg-gray-50 rounded-xl p-4 border border-gray-200 hover:shadow-md transition-shadow">
+                    <div class="relative mb-4">
+                        <iframe 
+                            src="http://192.168.1.18:8080/video"
+                            class="w-full h-40 rounded-lg border border-gray-300"
+                            allowfullscreen>
+                        </iframe>
+
+                        <div class="absolute top-2 right-2 bg-green-600 text-white text-xs px-2 py-1 rounded-full font-medium">
+                            AO VIVO
+                        </div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <h4 class="font-semibold text-gray-900">Câmera ao Vivo - #LIVE-001</h4>
+
+                        <div class="flex items-center text-sm text-gray-600">
+                            <i class="fa-solid fa-map-marker-alt mr-2"></i>
+                            Localização não definida
+                        </div>
+
+                        <div class="flex justify-between items-center mt-4">
+                            <button 
+                                onclick="window.open('http://192.168.1.18:8080/video')"
+                                class="bg-primary text-white px-3 py-1 rounded text-xs font-medium hover:bg-primary-dark transition-colors">
+                                Abrir Tela Cheia
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FIM DA CÂMERA AO VIVO -->
+
+                <!-- Seus cards antigos continuam aqui (Recording Card 1, 2, 3...) -->
+
+
+            
+
+    <script>
+        // Mobile menu functionality
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const sidebar = document.getElementById('sidebar');
+        const closeSidebar = document.getElementById('close-sidebar');
+        const overlay = document.getElementById('overlay');
+
+        function openSidebar() {
+            sidebar.classList.remove('-translate-x-full');
+            overlay.classList.remove('hidden');
+        }
+
+        function closeSidebarFn() {
+            sidebar.classList.add('-translate-x-full');
+            overlay.classList.add('hidden');
+        }
+
+        mobileMenuBtn.addEventListener('click', openSidebar);
+        closeSidebar.addEventListener('click', closeSidebarFn);
+        overlay.addEventListener('click', closeSidebarFn);
+
+        // Profile menu toggle functionality
+        function toggleProfileMenu() {
+            const profileMenu = document.getElementById('profile-menu');
+            profileMenu.classList.toggle('hidden');
+        }
+
+        // Close profile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const profileMenu = document.getElementById('profile-menu');
+            const profileButton = event.target.closest('[onclick="toggleProfileMenu()"]');
+            
+            if (!profileButton && !profileMenu.contains(event.target)) {
+                profileMenu.classList.add('hidden');
+            }
+        });
+    </script>
+    
+
+</body>
+</html>
+
+

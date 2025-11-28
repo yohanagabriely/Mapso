@@ -1,0 +1,266 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { inter: ['Inter', 'sans-serif'] },
+                    colors: {
+                        'primary': '#067D87',
+                        'secondary': '#EA580C',
+                        'success': '#10B981',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar { display: none; }
+        body { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-gray-50 font-inter min-h-screen">
+
+    <button id="mobile-menu-btn" class="lg:hidden fixed top-4 left-4 z-50 bg-white p-3 rounded-xl shadow-lg border border-gray-200">
+        <i class="fa-solid fa-bars text-xl text-gray-700"></i>
+    </button>
+
+    <div id="overlay" class="fixed inset-0 bg-black/50 z-30 hidden lg:hidden"></div>
+
+    <aside id="sidebar" class="fixed left-0 top-0 w-72 h-screen bg-white border-r border-gray-200 shadow-xl z-40 transform -translate-x-full lg:translate-x-0 transition-transform duration-300">
+        <div class="p-6">
+            <div class="flex items-center justify-between mb-8">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900">Alerta Recife</h1>
+                    <p class="text-sm text-gray-500">Sistema de DetecÃ§Ã£o</p>
+                </div>
+                <button id="close-sidebar" class="lg:hidden text-gray-500 hover:text-gray-700">
+                    <i class="fa-solid fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <nav class="space-y-3">
+                <a href="dashboard.html" class="flex items-center space-x-4 px-4 py-4 rounded-xl text-gray-600 hover:bg-gray-100 transition-colors">
+                    <i class="fa-solid fa-map text-lg"></i>
+                    <span class="font-medium">Mapa</span>
+                </a>
+                <a href="dado.html" class="flex items-center space-x-4 px-4 py-4 rounded-xl text-gray-600 hover:bg-gray-100 transition-colors">
+                    <i class="fa-solid fa-database text-lg"></i>
+                    <span class="font-medium">Dados</span>
+                </a>
+                <a href="camera.html" class="flex items-center space-x-4 px-4 py-4 rounded-xl text-gray-600 hover:bg-gray-100 transition-colors">
+                    <i class="fa-solid fa-camera text-lg"></i>
+                    <span class="font-medium">CÃ¢meras</span>
+                </a>
+                <a href="historico.html" class="flex items-center space-x-4 px-4 py-4 rounded-xl text-gray-600 hover:bg-gray-100 transition-colors">
+                    <i class="fa-solid fa-clock-rotate-left text-lg"></i>
+                    <span class="font-medium">HistÃ³rico</span>
+                </a>
+            </nav>
+        </div>
+        <div class="absolute bottom-6 left-6 right-6">
+            <div class="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-xl p-4 border border-primary/20">
+                <div class="flex items-center space-x-3">
+                    <div class="w-3 h-3 bg-success rounded-full animate-pulse"></div>
+                    <span class="text-sm font-medium text-gray-700">Sistema Ativo</span>
+                </div>
+                <p class="text-xs text-gray-500 mt-1">Monitoramento em tempo real</p>
+            </div>
+        </div>
+    </aside>
+
+    <div class="lg:ml-72">
+        <header id="header" class="bg-white border-b border-gray-200 px-4 sm:px-6 lg:px-8 py-4 lg:py-5 shadow-sm">
+            <div class="flex justify-between items-center">
+                <div class="ml-12 lg:ml-0">
+                    <h2 class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">Alterar Senha</h2>
+                    <p class="text-gray-500 mt-1 text-sm sm:text-base hidden sm:block">Atualize sua senha de acesso</p>
+                </div>
+                <div class="flex items-center space-x-3 sm:space-x-6">
+                    <div class="relative hidden sm:block">
+                        <i class="fa-regular fa-bell text-xl text-gray-600 cursor-pointer hover:text-primary transition-colors"></i>
+                        <span class="absolute -top-2 -right-2 w-5 h-5 bg-primary text-white text-xs rounded-full flex items-center justify-center">3</span>
+                    </div>
+                    <div class="relative">
+                        <div class="flex items-center space-x-2 sm:space-x-3 cursor-pointer" onclick="toggleProfileMenu()">
+                            <img src="https://www.publicdomainpictures.net/pictures/180000/velka/cat-1464103447LmK.jpg" class="w-10 h-10 sm:w-12 sm:h-12 rounded-full border-3 border-primary shadow-md" alt="User Avatar">
+                            <div class="hidden sm:block">
+                                <p class="font-semibold text-gray-900">lorena</p>
+                                <p class="text-sm text-gray-500">governo</p>
+                            </div>
+                            <i class="fa-solid fa-chevron-down text-gray-400 text-sm hidden sm:block"></i>
+                        </div>
+                        
+                        <div id="profile-menu" class="absolute right-0 top-full mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-200 py-2 z-50 hidden">
+                            <div class="px-4 py-3 border-b border-gray-100">
+                                <p class="font-semibold text-gray-900">Ana Silva</p>
+                                <p class="text-sm text-gray-500">ana.silva@recife.gov.br</p>
+                            </div>
+                            <div class="py-2">
+                                <a href="perfil.html" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors">
+                                    <i class="fa-solid fa-user text-gray-500 w-5"></i>
+                                    <span class="ml-3 font-medium">Meu Perfil</span>
+                                </a>
+                                <a href="alterar-foto.html" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors">
+                                    <i class="fa-solid fa-camera text-gray-500 w-5"></i>
+                                    <span class="ml-3 font-medium">Alterar Foto</span>
+                                </a>
+                                <a href="alterar-senha.html" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors">
+                                    <i class="fa-solid fa-key text-gray-500 w-5"></i>
+                                    <span class="ml-3 font-medium">Alterar Senha</span>
+                                </a>
+                                <a href="configuracoes.html" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors">
+                                    <i class="fa-solid fa-gear text-gray-500 w-5"></i>
+                                    <span class="ml-3 font-medium">ConfiguraÃ§Ãµes</span>
+                                </a>
+                                <div class="border-t border-gray-100 mt-2 pt-2">
+                                    <a href="index.html" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors">
+                                        <i class="fa-solid fa-sign-in-alt text-gray-500 w-5"></i>
+                                        <span class="ml-3 font-medium">Fazer Login</span>
+                                    </a>
+                                    <a onclick="fazerLogout()" class="flex items-center px-4 py-3 text-red-600 hover:bg-red-50 transition-colors cursor-pointer">
+                                        <i class="fa-solid fa-sign-out-alt text-red-500 w-5"></i>
+                                        <span class="ml-3 font-medium">Sair</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="p-4 sm:p-6 lg:p-8 max-w-2xl">
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+                <form onsubmit="alterarSenha(event)">
+                    <!-- Current Password -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-semibold text-gray-900 mb-2">Senha Atual</label>
+                        <div class="relative">
+                            <input type="password" id="current-password" placeholder="Digite sua senha atual" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" required>
+                            <button type="button" class="absolute right-3 top-3 text-gray-500 hover:text-gray-700" onclick="togglePasswordVisibility('current-password')">
+                                <i class="fa-solid fa-eye text-lg"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- New Password -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-semibold text-gray-900 mb-2">Nova Senha</label>
+                        <div class="relative">
+                            <input type="password" id="new-password" placeholder="Digite sua nova senha (mÃ­n. 8 caracteres)" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" required minlength="8">
+                            <button type="button" class="absolute right-3 top-3 text-gray-500 hover:text-gray-700" onclick="togglePasswordVisibility('new-password')">
+                                <i class="fa-solid fa-eye text-lg"></i>
+                            </button>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-2">MÃ­nimo 8 caracteres</p>
+                    </div>
+
+                    <!-- Confirm Password -->
+                    <div class="mb-8">
+                        <label class="block text-sm font-semibold text-gray-900 mb-2">Confirmar Nova Senha</label>
+                        <div class="relative">
+                            <input type="password" id="confirm-password" placeholder="Confirme sua nova senha" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" required>
+                            <button type="button" class="absolute right-3 top-3 text-gray-500 hover:text-gray-700" onclick="togglePasswordVisibility('confirm-password')">
+                                <i class="fa-solid fa-eye text-lg"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Security Info -->
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8">
+                        <div class="flex items-start space-x-3">
+                            <i class="fa-solid fa-info-circle text-blue-600 mt-1"></i>
+                            <div>
+                                <p class="font-semibold text-blue-900">Dica de SeguranÃ§a</p>
+                                <p class="text-sm text-blue-800 mt-1">Use uma combinaÃ§Ã£o de letras maiÃºsculas, minÃºsculas, nÃºmeros e sÃ­mbolos para uma senha forte.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <button type="submit" class="flex-1 bg-primary text-white px-6 py-3 rounded-lg font-medium hover:bg-primary-dark transition-colors">
+                            <i class="fa-solid fa-save mr-2"></i>Salvar AlteraÃ§Ãµes
+                        </button>
+                        <a href="perfil.html" class="flex-1 border-2 border-gray-300 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-50 transition-colors text-center">
+                            Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const sidebar = document.getElementById('sidebar');
+        const closeSidebar = document.getElementById('close-sidebar');
+        const overlay = document.getElementById('overlay');
+
+        function openSidebar() {
+            sidebar.classList.remove('-translate-x-full');
+            overlay.classList.remove('hidden');
+        }
+
+        function closeSidebarFn() {
+            sidebar.classList.add('-translate-x-full');
+            overlay.classList.add('hidden');
+        }
+
+        mobileMenuBtn.addEventListener('click', openSidebar);
+        closeSidebar.addEventListener('click', closeSidebarFn);
+        overlay.addEventListener('click', closeSidebarFn);
+
+        function toggleProfileMenu() {
+            const profileMenu = document.getElementById('profile-menu');
+            profileMenu.classList.toggle('hidden');
+        }
+
+        document.addEventListener('click', function(event) {
+            const profileMenu = document.getElementById('profile-menu');
+            const profileButton = event.target.closest('[onclick="toggleProfileMenu()"]');
+            
+            if (!profileButton && !profileMenu.contains(event.target)) {
+                profileMenu.classList.add('hidden');
+            }
+        });
+
+        function togglePasswordVisibility(inputId) {
+            const input = document.getElementById(inputId);
+            input.type = input.type === 'password' ? 'text' : 'password';
+        }
+
+        function alterarSenha(event) {
+            event.preventDefault();
+            const newPassword = document.getElementById('new-password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+
+            if (newPassword !== confirmPassword) {
+                alert('As senhas nÃ£o correspondem!');
+                return;
+            }
+
+            alert('Senha alterada com sucesso!');
+            window.location.href = 'perfil.html';
+        }
+
+        function fazerLogout() {
+            if (confirm('Tem certeza que deseja sair?')) {
+                localStorage.removeItem('user');
+                window.location.href = 'index.html';
+            }
+        }
+    </script>
+
+</body>
+</html>
+

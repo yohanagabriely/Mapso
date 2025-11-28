@@ -1,0 +1,493 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script> window.FontAwesomeConfig = { autoReplaceSvg: 'nest'};</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        inter: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        'primary': '#067D87',
+                        'primary-dark': '#B91C1C',
+                        'secondary': '#EA580C',
+                        'accent': '#F59E0B',
+                        'success': '#10B981',
+                        'neutral-800': '#F9FAFB',
+                        'neutral-700': '#F3F4F6',
+                        'neutral-600': '#E5E7EB',
+                        'neutral-500': '#6B7280',
+                        'neutral-400': '#9CA3AF',
+                        'neutral-300': '#D1D5DB',
+                        'neutral-200': '#E5E7EB',
+                        'neutral-100': '#1F2937',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar { display: none;}
+        body { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-gray-50 font-inter min-h-screen">
+
+    <button id="mobile-menu-btn" class="lg:hidden fixed top-4 left-4 z-50 bg-white p-3 rounded-lg shadow-lg border border-gray-200">
+        <i class="fa-solid fa-bars text-xl text-gray-700"></i>
+    </button>
+
+    <aside id="sidebar" class="fixed left-0 top-0 w-72 h-screen bg-white border-r border-gray-200 shadow-xl z-40 transform -translate-x-full lg:translate-x-0 transition-transform duration-300">
+        <div class="p-6">
+            <div class="flex items-center justify-between mb-8">
+                <div class="flex items-center space-x-3">
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-900">Alerta Recife</h1>
+                        <p class="text-sm text-gray-500">Sistema de Detecção</p>
+                    </div>
+                </div>
+                <button id="close-sidebar" class="lg:hidden text-gray-500 hover:text-gray-700">
+                    <i class="fa-solid fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <nav class="space-y-3">
+                <a href="dashboard.html" class="flex items-center space-x-4 px-4 py-4 rounded-xl text-gray-600 hover:bg-gray-100 transition-colors">
+                    <i class="fa-solid fa-map text-lg"></i>
+                    <span class="font-medium">Mapa</span>
+                </a>
+
+                <a href="dado.html" class="flex items-center space-x-4 px-4 py-4 rounded-xl text-gray-600 hover:bg-gray-100 transition-colors">
+                    <i class="fa-solid fa-database text-lg"></i>
+                    <span class="font-medium">Dados</span>
+                </a>
+
+                <a href="camera.html" class="flex items-center space-x-4 px-4 py-4 rounded-xl text-gray-600 hover:bg-gray-100 transition-colors">
+                    <i class="fa-solid fa-camera text-lg"></i>
+                    <span class="font-medium">Câmeras</span>
+                </a>
+
+                <div class="flex items-center space-x-4 px-4 py-4 rounded-xl bg-[#067D87] text-white cursor-pointer shadow-lg">
+                    <i class="fa-solid fa-clock-rotate-left text-lg"></i>
+                    <span class="font-semibold">Histórico</span>
+                </div>
+            </nav>
+        </div>
+        
+        <div class="absolute bottom-6 left-6 right-6">
+            <div class="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-xl p-4 border border-primary/20">
+                <div class="flex items-center space-x-3">
+                    <div class="w-3 h-3 bg-success rounded-full animate-pulse"></div>
+                    <span class="text-sm font-medium text-gray-700">Sistema Ativo</span>
+                </div>
+                <p class="text-xs text-gray-500 mt-1">Monitoramento em tempo real</p>
+            </div>
+        </div>
+    </aside>
+
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden lg:hidden"></div>
+
+    <div class="lg:ml-72">
+        <header id="header" class="bg-white border-b border-gray-200 px-4 sm:px-6 lg:px-8 py-4 lg:py-5 shadow-sm">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div class="ml-12 lg:ml-0">
+                    <h2 class="text-2xl lg:text-3xl font-bold text-gray-900">Histórico de Acidentes</h2>
+                    <p class="text-sm lg:text-base text-gray-500 mt-1">Registro completo de ocorrências detectadas</p>
+                </div>
+                <div class="flex items-center space-x-4 lg:space-x-6 ml-auto">
+                    <div class="relative">
+                        <i class="fa-regular fa-bell text-lg lg:text-xl text-gray-600 cursor-pointer hover:text-primary transition-colors"></i>
+                        <span class="absolute -top-2 -right-2 w-5 h-5 bg-primary text-white text-xs rounded-full flex items-center justify-center">3</span>
+                    </div>
+                    <div class="relative">
+                        <div class="flex items-center space-x-2 lg:space-x-3 cursor-pointer" onclick="toggleProfileMenu()">
+                            <img src="http://googleusercontent.com/image_generation_content/0" class="w-10 h-10 lg:w-12 lg:h-12 rounded-full border-3 border-primary shadow-md" alt="User Avatar">
+                            <div class="hidden sm:block">
+                                <p class="font-semibold text-gray-900">lorena</p>
+                                <p class="text-sm text-gray-500">governo</p>
+                            </div>
+                            <i class="fa-solid fa-chevron-down text-gray-400 text-sm hidden sm:block"></i>
+                        </div>
+                        
+                        <div id="profile-menu" class="absolute right-0 top-full mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-200 py-2 z-50 hidden">
+                            <div class="px-4 py-3 border-b border-gray-100">
+                                <p class="font-semibold text-gray-900">Ana Silva</p>
+                                <p class="text-sm text-gray-500">ana.silva@recife.gov.br</p>
+                            </div>
+                            
+                            <div class="py-2">
+                                <a href="perfil.html" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors">
+                                    <i class="fa-solid fa-user text-gray-500 w-5"></i>
+                                    <span class="ml-3 font-medium">Meu Perfil</span>
+                                </a>
+                                
+                                <a href="alterar-foto.html" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors">
+                                    <i class="fa-solid fa-camera text-gray-500 w-5"></i>
+                                    <span class="ml-3 font-medium">Alterar Foto</span>
+                                </a>
+                                
+                                <a href="alterar-senha.html" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors">
+                                    <i class="fa-solid fa-key text-gray-500 w-5"></i>
+                                    <span class="ml-3 font-medium">Alterar Senha</span>
+                                </a>
+                                
+                                <a href="configuracoes.html" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors">
+                                    <i class="fa-solid fa-gear text-gray-500 w-5"></i>
+                                    <span class="ml-3 font-medium">Configurações</span>
+                                </a>
+                                
+                                <div class="border-t border-gray-100 mt-2 pt-2">
+                                    <a href="index.html" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors">
+                                        <i class="fa-solid fa-sign-in-alt text-gray-500 w-5"></i>
+                                        <span class="ml-3 font-medium">Fazer login</span>
+                                    </a>
+                                    
+                                    <a href="index.html" class="flex items-center px-4 py-3 text-red-600 hover:bg-red-50 transition-colors cursor-pointer">
+                                        <i class="fa-solid fa-sign-out-alt text-red-500 w-5"></i>
+                                        <span class="ml-3 font-medium">Sair</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <main class="p-4 sm:p-6 lg:p-8">
+            <section id="filters-section" class="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-200 mb-6 lg:mb-8">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 items-end">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Data Inicial</label>
+                        <input type="date" id="filter-data-inicial" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Data Final</label>
+                        <input type="date" id="filter-data-final" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Severidade</label>
+                        <select id="filter-severidade" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary">
+                            <option>Todas</option>
+                            <option>Crítico</option>
+                            <option>Alto</option>
+                            <option>Médio</option>
+                            <option>Baixo</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Região</label>
+                        <select id="filter-regiao" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary">
+                            <option>Todas as regiões</option>
+                            <option>Centro</option>
+                            <option>Boa Viagem</option>
+                            <option>Imbiribeira</option>
+                            <option>Casa Amarela</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                        <select id="filter-status" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary">
+                            <option>Todos</option>
+                            <option>Resolvido</option>
+                            <option>Em Andamento</option>
+                            <option>Pendente</option>
+                        </select>
+                    </div>
+                    <div>
+                        <button onclick="aplicarFiltros()" class="w-full bg-[#067D87] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#05666f] transition-colors">
+                            <i class="fa-solid fa-search mr-2"></i>Filtrar
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="history-stats" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 lg:gap-6 mb-6 lg:mb-8">
+                <div class="bg-white rounded-2xl p-4 lg:p-6 shadow-sm border border-gray-200">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500 text-xs sm:text-sm font-medium">Total de Acidentes</p>
+                            <p class="text-2xl lg:text-3xl font-bold text-gray-900 mt-2">1,247</p>
+                        </div>
+                        <div class="w-12 h-12 lg:w-14 lg:h-14 bg-gray-100 rounded-xl flex items-center justify-center">
+                            <i class="fa-solid fa-list text-xl lg:text-2xl text-gray-600"></i>
+                        </div>
+                    </div>
+                    <p class="text-xs sm:text-sm text-gray-500 mt-3 lg:mt-4">Últimos 30 dias</p>
+                </div>
+                <div class="bg-white rounded-2xl p-4 lg:p-6 shadow-sm border border-gray-200">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500 text-xs sm:text-sm font-medium">Casos Críticos</p>
+                            <p class="text-2xl lg:text-3xl font-bold text-primary mt-2">89</p>
+                        </div>
+                        <div class="w-12 h-12 lg:w-14 lg:h-14 bg-primary/10 rounded-xl flex items-center justify-center">
+                            <i class="fa-solid fa-exclamation-triangle text-xl lg:text-2xl text-primary"></i>
+                        </div>
+                    </div>
+                    <p class="text-xs sm:text-sm text-gray-500 mt-3 lg:mt-4">7.1% do total</p>
+                </div>
+                <div class="bg-white rounded-2xl p-4 lg:p-6 shadow-sm border border-gray-200">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500 text-xs sm:text-sm font-medium">Taxa Resolução</p>
+                            <p class="text-2xl lg:text-3xl font-bold text-success mt-2">94.2%</p>
+                        </div>
+                        <div class="w-12 h-12 lg:w-14 lg:h-14 bg-success/10 rounded-xl flex items-center justify-center">
+                            <i class="fa-solid fa-check-circle text-xl lg:text-2xl text-success"></i>
+                        </div>
+                    </div>
+                    <p class="text-xs sm:text-sm text-gray-500 mt-3 lg:mt-4">+2.3% vs mês anterior</p>
+                </div>
+                <div class="bg-white rounded-2xl p-4 lg:p-6 shadow-sm border border-gray-200">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500 text-xs sm:text-sm font-medium">Tempo Médio</p>
+                            <p class="text-2xl lg:text-3xl font-bold text-secondary mt-2">6.4min</p>
+                        </div>
+                        <div class="w-12 h-12 lg:w-14 lg:h-14 bg-secondary/10 rounded-xl flex items-center justify-center">
+                            <i class="fa-solid fa-clock text-xl lg:text-2xl text-secondary"></i>
+                        </div>
+                    </div>
+                    <p class="text-xs sm:text-sm text-gray-500 mt-3 lg:mt-4">Resposta média</p>
+                </div>
+            </section>
+
+            <section id="history-table-section" class="bg-white rounded-2xl shadow-sm border border-gray-200">
+                <div class="p-4 sm:p-6 border-b border-gray-200">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                        <h3 class="text-lg lg:text-xl font-bold text-gray-900">Registro de Ocorrências</h3>
+                        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
+                            <button class="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors">
+                                <i class="fa-solid fa-download mr-2"></i>Exportar CSV
+                            </button>
+                            <button class="bg-[#067D87] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#056973] transition-colors">
+                                <i class="fa-solid fa-file-pdf mr-2"></i>Relatório PDF
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-4 lg:px-6 py-3 lg:py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data/Hora</th>
+                                <th class="px-4 lg:px-6 py-3 lg:py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
+                                <th class="px-4 lg:px-6 py-3 lg:py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Local</th>
+                                <th class="px-4 lg:px-6 py-3 lg:py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Severidade</th>
+                                <th class="px-4 lg:px-6 py-3 lg:py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">Status</th>
+                                <th class="px-4 lg:px-6 py-3 lg:py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">Tempo</th>
+                                <th class="px-4 lg:px-6 py-3 lg:py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ocorrencias-table-body" class="bg-white divide-y divide-gray-200">
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // Definição dos Dados Reais das Ocorrências (Fonte de dados simulada)
+        const DADOS_OCORRENCIAS = [
+            { data: '15/10/2024', hora: '14:32', tipo: 'Colisão', local: 'Av. Mascarenhas', severidade: 'Crítico', status: 'Resolvido', tempo: '3.2 min', icon: 'fa-car-burst', cor: 'text-red-500' },
+            { data: '15/10/2024', hora: '12:15', tipo: 'Atropelamento', local: 'Rua da Aurora', severidade: 'Alto', status: 'Resolvido', tempo: '5.8 min', icon: 'fa-person-falling', cor: 'text-secondary' },
+            { data: '14/10/2024', hora: '18:45', tipo: 'Semáforo', local: 'Av. Agamenon', severidade: 'Médio', status: 'Em Andamento', tempo: '12.5 min', icon: 'fa-traffic-light', cor: 'text-accent' },
+            { data: '14/10/2024', hora: '09:00', tipo: 'Alagamento', local: 'Av. Boa Viagem', severidade: 'Alto', status: 'Em Andamento', tempo: '45.0 min', icon: 'fa-cloud-showers-heavy', cor: 'text-primary' },
+            { data: '13/10/2024', hora: '22:05', tipo: 'Queda de Árvore', local: 'Rua Conselheiro Rosa e Silva', severidade: 'Crítico', status: 'Resolvido', tempo: '18.7 min', icon: 'fa-tree-deciduous', cor: 'text-red-500' },
+            { data: '13/10/2024', hora: '10:30', tipo: 'Obra Não Sinalizada', local: 'Estrada do Encanamento', severidade: 'Baixo', status: 'Pendente', tempo: 'N/A', icon: 'fa-road-barrier', cor: 'text-accent' },
+            { data: '12/10/2024', hora: '16:00', tipo: 'Colisão (Leve)', local: 'Av. Sul', severidade: 'Médio', status: 'Resolvido', tempo: '9.0 min', icon: 'fa-car-burst', cor: 'text-secondary' },
+            { data: '12/10/2024', hora: '07:50', tipo: 'Bloqueio Via', local: 'Av. Caxangá', severidade: 'Crítico', status: 'Em Andamento', tempo: '22.0 min', icon: 'fa-road-lock', cor: 'text-primary' },
+            { data: '11/10/2024', hora: '17:30', tipo: 'Atropelamento', local: 'Av. Boa Viagem', severidade: 'Alto', status: 'Resolvido', tempo: '6.1 min', icon: 'fa-person-falling', cor: 'text-secondary' },
+            { data: '11/10/2024', hora: '11:00', tipo: 'Semáforo', local: 'Rua do Sol', severidade: 'Baixo', status: 'Resolvido', tempo: '4.5 min', icon: 'fa-traffic-light', cor: 'text-accent' },
+            { data: '10/10/2024', hora: '08:10', tipo: 'Alagamento', local: 'Madalena', severidade: 'Médio', status: 'Resolvido', tempo: '30.0 min', icon: 'fa-cloud-showers-heavy', cor: 'text-primary' },
+        ];
+
+        // Mapeamento de cores de fundo do status (Tailwind)
+        const STATUS_COLORS = {
+            'Crítico': { bg: 'bg-red-100', text: 'text-red-800' },
+            'Alto': { bg: 'bg-secondary/10', text: 'text-secondary' },
+            'Médio': { bg: 'bg-accent/10', text: 'text-accent' },
+            'Baixo': { bg: 'bg-green-100', text: 'text-green-800' },
+            'Resolvido': { bg: 'bg-green-100', text: 'text-green-800' },
+            'Em Andamento': { bg: 'bg-accent/10', text: 'text-accent' },
+            'Pendente': { bg: 'bg-gray-100', text: 'text-gray-700' },
+        };
+
+        // --- FUNÇÕES DE RENDERIZAÇÃO E INICIALIZAÇÃO ---
+
+        function renderizarTabela(dados) {
+            const tbody = document.getElementById('ocorrencias-table-body');
+            tbody.innerHTML = ''; // Limpa a tabela
+
+            if (dados.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="px-4 lg:px-6 py-8 text-center text-sm text-gray-500">
+                            Nenhuma ocorrência encontrada para os filtros selecionados.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            dados.forEach(ocorrencia => {
+                const severidadeColor = STATUS_COLORS[ocorrencia.severidade] || { bg: 'bg-gray-100', text: 'text-gray-700' };
+                const statusColor = STATUS_COLORS[ocorrencia.status] || { bg: 'bg-gray-100', text: 'text-gray-700' };
+
+                const row = `
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-4 lg:px-6 py-3 lg:py-4 whitespace-nowrap text-xs lg:text-sm text-gray-900">
+                            <div>${ocorrencia.data}</div>
+                            <div class="text-xs text-gray-500">${ocorrencia.hora}</div>
+                        </td>
+                        <td class="px-4 lg:px-6 py-3 lg:py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <i class="fa-solid ${ocorrencia.icon} ${ocorrencia.cor} mr-2 text-sm"></i>
+                                <span class="text-xs lg:text-sm text-gray-900">${ocorrencia.tipo}</span>
+                            </div>
+                        </td>
+                        <td class="px-4 lg:px-6 py-3 lg:py-4 text-xs lg:text-sm text-gray-900">${ocorrencia.local}</td>
+                        <td class="px-4 lg:px-6 py-3 lg:py-4 whitespace-nowrap">
+                            <span class="px-2 py-1 text-xs font-medium ${severidadeColor.bg} ${severidadeColor.text} rounded-full">${ocorrencia.severidade}</span>
+                        </td>
+                        <td class="px-4 lg:px-6 py-3 lg:py-4 whitespace-nowrap hidden sm:table-cell">
+                            <span class="px-2 py-1 text-xs font-medium ${statusColor.bg} ${statusColor.text} rounded-full">${ocorrencia.status}</span>
+                        </td>
+                        <td class="px-4 lg:px-6 py-3 lg:py-4 whitespace-nowrap text-xs lg:text-sm text-gray-900 hidden md:table-cell">${ocorrencia.tempo}</td>
+                        <td class="px-4 lg:px-6 py-3 lg:py-4 whitespace-nowrap text-xs lg:text-sm font-medium">
+                            <button class="text-primary hover:text-primary-dark">Ver</button>
+                        </td>
+                    </tr>
+                `;
+                tbody.insertAdjacentHTML('beforeend', row);
+            });
+        }
+
+        // --- FUNÇÃO PRINCIPAL DE FILTRAGEM ---
+
+        function aplicarFiltros() {
+            // 1. Coletar os valores dos filtros
+            const dataInicial = document.getElementById('filter-data-inicial').value;
+            const dataFinal = document.getElementById('filter-data-final').value;
+            const severidade = document.getElementById('filter-severidade').value;
+            const regiao = document.getElementById('filter-regiao').value;
+            const status = document.getElementById('filter-status').value;
+
+            // Função auxiliar para converter datas do formato input (YYYY-MM-DD) para objeto Date para comparação
+            const parseDate = (dateStr, isEnd = false) => {
+                if (!dateStr) return null;
+                const [year, month, day] = dateStr.split('-');
+                let date = new Date(year, month - 1, day); // month - 1 porque JS usa mês 0-11
+                if (isEnd) {
+                     // Inclui o dia final completo
+                     date.setHours(23, 59, 59, 999);
+                }
+                return date;
+            };
+
+            const dataInicio = parseDate(dataInicial);
+            const dataFim = parseDate(dataFinal, true);
+
+            // 2. Filtrar os dados
+            const dadosFiltrados = DADOS_OCORRENCIAS.filter(ocorrencia => {
+                let matches = true;
+                
+                // --- Conversão da Data da Ocorrência (DD/MM/AAAA) para Comparação ---
+                const [day, month, year] = ocorrencia.data.split('/');
+                const ocorrenciaDate = new Date(year, month - 1, day); 
+
+                // 1. Filtragem por Data
+                if (dataInicio && ocorrenciaDate < dataInicio) {
+                    matches = false;
+                }
+                if (dataFim && ocorrenciaDate > dataFim) {
+                    matches = false;
+                }
+
+                // 2. Filtragem por Severidade
+                if (severidade !== 'Todas' && ocorrencia.severidade !== severidade) {
+                    matches = false;
+                }
+
+                // 3. Filtragem por Região (Baseado na presença do nome da região no campo local)
+                if (regiao !== 'Todas as regiões') {
+                    // Normaliza e coloca em minúsculas para ignorar acentos e case
+                    const localNormalizado = ocorrencia.local.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+                    const regiaoNormalizada = regiao.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+                    
+                    if (!localNormalizado.includes(regiaoNormalizada)) {
+                        matches = false;
+                    }
+                }
+
+                // 4. Filtragem por Status
+                if (status !== 'Todos' && ocorrencia.status !== status) {
+                    matches = false;
+                }
+
+                return matches;
+            });
+
+            // 3. Renderizar a tabela com os resultados
+            renderizarTabela(dadosFiltrados);
+        }
+
+        // --- FUNÇÕES AUXILIARES DE NAVEGAÇÃO ---
+
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebar-overlay');
+        const closeSidebar = document.getElementById('close-sidebar');
+
+        function openSidebar() {
+            sidebar.classList.remove('-translate-x-full');
+            sidebarOverlay.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeSidebarFunc() {
+            sidebar.classList.add('-translate-x-full');
+            sidebarOverlay.classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        mobileMenuBtn.addEventListener('click', openSidebar);
+        closeSidebar.addEventListener('click', closeSidebarFunc);
+        sidebarOverlay.addEventListener('click', closeSidebarFunc);
+
+        function toggleProfileMenu() {
+            const profileMenu = document.getElementById('profile-menu');
+            profileMenu.classList.toggle('hidden');
+        }
+
+        document.addEventListener('click', function(event) {
+            const profileMenu = document.getElementById('profile-menu');
+            const profileButton = event.target.closest('[onclick="toggleProfileMenu()"]');
+            
+            if (!profileButton && !profileMenu.contains(event.target)) {
+                profileMenu.classList.add('hidden');
+            }
+        });
+
+        // Iniciar renderização da tabela ao carregar a página
+        document.addEventListener('DOMContentLoaded', () => {
+            renderizarTabela(DADOS_OCORRENCIAS);
+        });
+    </script>
+
+</body>
+</html>
