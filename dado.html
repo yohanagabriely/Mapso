@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
@@ -7,30 +7,20 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script> window.FontAwesomeConfig = { autoReplaceSvg: 'nest'};</script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous"></script>
     
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: {
-                        inter: ['Inter', 'sans-serif'],
-                    },
+                    fontFamily: { inter: ['Inter', 'sans-serif'] },
                     colors: {
                         'primary': '#067D87',
                         'primary-dark': '#B91C1C',
                         'secondary': '#EA580C',
                         'accent': '#F59E0B',
                         'success': '#10B981',
-                        'neutral-800': '#F9FAFB',
-                        'neutral-700': '#F3F4F6',
-                        'neutral-600': '#E5E7EB',
                         'neutral-500': '#6B7280',
-                        'neutral-400': '#9CA3AF',
-                        'neutral-300': '#D1D5DB',
-                        'neutral-200': '#E5E7EB',
-                        'neutral-100': '#1F2937',
                     }
                 }
             }
@@ -40,7 +30,7 @@
         ::-webkit-scrollbar { display: none;}
         body { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
-    <title>Monitoramento de Sensores ESP32</title>
+    <title>Monitoramento Alerta Recife</title>
 </head>
 <body class="bg-gray-50 font-inter min-h-screen">
 
@@ -66,7 +56,7 @@
                     <i class="fa-solid fa-map text-lg"></i>
                     <span class="font-medium">Mapa</span>
                 </a>
-                <div class="flex items-center space-x-4 px-4 py-4 rounded-xl bg-[#067D87] text-white cursor-pointer shadow-lg">
+                <div class="flex items-center space-x-4 px-4 py-4 rounded-xl bg-primary text-white cursor-pointer shadow-lg">
                     <i class="fa-solid fa-database text-lg"></i>
                     <span class="font-semibold">Dados</span>
                 </div>
@@ -91,12 +81,26 @@
         </div>
     </aside>
 
+    <div id="alert-modal" class="fixed inset-0 bg-black/70 z-50 flex items-center justify-center hidden">
+        <div class="bg-white rounded-xl shadow-2xl p-8 w-11/12 max-w-md scale-100 transition-all">
+            <div class="flex items-center space-x-4 mb-4">
+                <i class="fa-solid fa-triangle-exclamation text-4xl text-primary-dark animate-pulse"></i>
+                <h3 class="text-2xl font-bold text-gray-900">ALERTA DE SEGURANÇA!</h3>
+            </div>
+            <p class="text-gray-700 mb-6">Ruído Elevado e Impacto detectados!</p>
+            <div class="flex justify-end space-x-3">
+                <button onclick="closeAlertModal()" class="bg-gray-200 px-4 py-2 rounded-lg font-medium">Ignorar</button>
+                <button onclick="window.location.href='camera.html'" class="bg-primary text-white px-4 py-2 rounded-lg font-medium">Ver Câmera</button>
+            </div>
+        </div>
+    </div>
+
     <div class="lg:ml-72">
         <header id="header" class="bg-white border-b border-gray-200 px-4 sm:px-6 lg:px-8 py-4 lg:py-5 shadow-sm">
             <div class="flex justify-between items-center">
                 <div class="ml-12 lg:ml-0">
-                    <h2 class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">Painel de Sensores</h2>
-                    <p class="text-xs sm:text-sm text-gray-500 mt-1 hidden sm:block">Monitoramento de Som, Temperatura e Impacto (ESP32)</p>
+                    <h2 class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">Painel de Sensores (Nuvem)</h2>
+                    <p class="text-xs sm:text-sm text-gray-500 mt-1 hidden sm:block">Monitoramento de Som, Temperatura e Impacto (ThingSpeak)</p>
                 </div>
                 <div class="flex items-center space-x-3 sm:space-x-6">
                     <div class="relative">
@@ -115,31 +119,19 @@
                         
                         <div id="profile-menu" class="absolute right-0 top-full mt-2 w-56 sm:w-64 bg-white rounded-xl shadow-xl border border-gray-200 py-2 z-50 hidden">
                             <div class="px-4 py-3 border-b border-gray-100">
-                                <p class="font-semibold text-gray-900">Ana Silva</p>
-                                <p class="text-sm text-gray-500">ana.silva@recife.gov.br</p>
+                                <p class="font-semibold text-gray-900">Lorena</p>
+                                <p class="text-sm text-gray-500">lorena@recife.gov.br</p>
                             </div>
                             <div class="py-2">
                                 <a href="perfil.html" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors">
                                     <i class="fa-solid fa-gear text-gray-500 w-5"></i>
                                     <span class="ml-3 font-medium">Meu Perfil</span>
                                 </a>
-                                <a href="alterar-foto.html" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors">
-                                    <i class="fa-solid fa-gear text-gray-500 w-5"></i>
-                                    <span class="ml-3 font-medium">Alterar Foto</span>
-                                </a>
-                                <a href="alterar-senha.html" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors">
-                                    <i class="fa-solid fa-gear text-gray-500 w-5"></i>
-                                    <span class="ml-3 font-medium">Alterar Senha</span>
-                                </a>
                                 <a href="configuracoes.html" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors">
                                     <i class="fa-solid fa-gear text-gray-500 w-5"></i>
                                     <span class="ml-3 font-medium">Configurações</span>
                                 </a>
-
                                 <div class="border-t border-gray-100 mt-2 pt-2">
-                                    <a href="index.html" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors">
-                                        <span class="ml-3 font-medium">Fazer login</span>
-                                    </a>
                                     <a href="index.html" class="flex items-center px-4 py-3 text-red-600 hover:bg-red-50 transition-colors cursor-pointer">
                                         <i class="fa-solid fa-sign-out-alt text-red-500 w-5"></i>
                                         <span class="ml-3 font-medium">Sair</span>
@@ -153,59 +145,58 @@
         </header>
 
         <main class="p-4 sm:p-6 lg:p-8">
-            
             <section id="sensor-live-data" class="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-4 lg:gap-6 mb-8">
                 
-                <div class="bg-white rounded-xl lg:rounded-2xl p-4 lg:p-6 shadow-xl border border-gray-200 hover:shadow-lg transition-shadow duration-300">
+                <div id="card-sound" class="bg-white rounded-xl lg:rounded-2xl p-4 lg:p-6 shadow-xl border border-gray-200 transition-shadow duration-300">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-gray-500 text-xs sm:text-sm font-medium">Nível de Som (%)</p>
                             <p id="sound-value" class="text-3xl lg:text-4xl font-extrabold text-gray-900 mt-1 lg:mt-2">--</p>
                         </div>
-                        <div class="w-14 h-14 lg:w-16 lg:h-16 bg-primary/10 rounded-xl flex items-center justify-center">
-                            <i class="fa-solid fa-volume-up text-2xl lg:text-3xl text-primary"></i>
+                        <div class="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center text-primary">
+                            <i class="fa-solid fa-volume-up text-2xl"></i>
                         </div>
                     </div>
-                    <p id="sound-status" class="text-sm sm:text-base font-semibold text-gray-500 mt-4">Carregando...</p>
+                    <p id="sound-status" class="text-sm font-semibold text-gray-500 mt-4">Carregando...</p>
                 </div>
 
-                <div class="bg-white rounded-xl lg:rounded-2xl p-4 lg:p-6 shadow-xl border border-gray-200 hover:shadow-lg transition-shadow duration-300">
+                <div id="card-temp" class="bg-white rounded-xl lg:rounded-2xl p-4 lg:p-6 shadow-xl border border-gray-200 transition-shadow duration-300">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-gray-500 text-xs sm:text-sm font-medium">Temperatura (ºC)</p>
                             <p id="temp-value" class="text-3xl lg:text-4xl font-extrabold text-gray-900 mt-1 lg:mt-2">--</p>
                         </div>
-                        <div class="w-14 h-14 lg:w-16 lg:h-16 bg-secondary/10 rounded-xl flex items-center justify-center">
-                            <i class="fa-solid fa-thermometer-half text-2xl lg:text-3xl text-secondary"></i>
+                        <div class="w-14 h-14 bg-secondary/10 rounded-xl flex items-center justify-center text-secondary">
+                            <i class="fa-solid fa-thermometer-half text-2xl"></i>
                         </div>
                     </div>
-                    <p id="temp-status" class="text-sm sm:text-base font-semibold text-gray-500 mt-4">Carregando...</p>
+                    <p id="temp-status" class="text-sm font-semibold text-gray-500 mt-4">Carregando...</p>
                 </div>
 
-                <div class="bg-white rounded-xl lg:rounded-2xl p-4 lg:p-6 shadow-xl border border-gray-200 hover:shadow-lg transition-shadow duration-300">
+                <div id="card-impact" class="bg-white rounded-xl lg:rounded-2xl p-4 lg:p-6 shadow-xl border border-gray-200 transition-shadow duration-300">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-gray-500 text-xs sm:text-sm font-medium">Status de Impacto</p>
                             <p id="impact-value" class="text-3xl lg:text-4xl font-extrabold text-gray-900 mt-1 lg:mt-2">--</p>
                         </div>
-                        <div class="w-14 h-14 lg:w-16 lg:h-16 bg-accent/10 rounded-xl flex items-center justify-center">
-                            <i class="fa-solid fa-bolt text-2xl lg:text-3xl text-accent"></i>
+                        <div class="w-14 h-14 bg-accent/10 rounded-xl flex items-center justify-center text-accent">
+                            <i class="fa-solid fa-bolt text-2xl"></i>
                         </div>
                     </div>
-                    <p id="impact-status" class="text-sm sm:text-base font-semibold text-gray-500 mt-4">Carregando...</p>
+                    <p id="impact-status" class="text-sm font-semibold text-gray-500 mt-4">Carregando...</p>
                 </div>
                 
-                <div class="bg-white rounded-xl lg:rounded-2xl p-4 lg:p-6 shadow-xl border border-gray-200 hover:shadow-lg transition-shadow duration-300">
+                <div class="bg-white rounded-xl lg:rounded-2xl p-4 lg:p-6 shadow-xl border border-gray-200">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-gray-500 text-xs sm:text-sm font-medium">Status do ESP32</p>
-                            <p class="text-3xl lg:text-4xl font-extrabold text-success mt-1 lg:mt-2">ONLINE</p>
+                            <p class="text-gray-500 text-xs sm:text-sm font-medium">Status do Servidor</p>
+                            <p id="cloud-status" class="text-3xl lg:text-4xl font-extrabold text-success mt-1 lg:mt-2">ONLINE</p>
                         </div>
-                        <div class="w-14 h-14 lg:w-16 lg:h-16 bg-success/10 rounded-xl flex items-center justify-center">
-                            <i class="fa-solid fa-wifi text-2xl lg:text-3xl text-success"></i>
+                        <div class="w-14 h-14 bg-success/10 rounded-xl flex items-center justify-center text-success">
+                            <i class="fa-solid fa-cloud text-2xl"></i>
                         </div>
                     </div>
-                    <p class="text-sm sm:text-base font-semibold text-success mt-4">Última atualização: <span id="last-update" class="font-bold">--</span></p>
+                    <p class="text-sm font-semibold text-success mt-4">Última atualização: <span id="last-update" class="font-bold">--</span></p>
                 </div>
 
             </section>
@@ -214,127 +205,164 @@
 
     <script>
         // =======================================================
-        // === CONFIGURAÇÃO IP DA API (CRUCIAL) ===
+        // === CONFIGURAÇÕES DO THINGSPEAK (AJUSTE AQUI) ===
         // =======================================================
-        // Seu site buscará dados neste endereço (ESP32)
-       const ESP32_API_URL = 'https://unequalled-hipolito-overbulkily.ngrok-free.app/data';
+        const CHANNEL_ID = '3202067'; // ⚠️ SEU ID NUMÉRICO DO CANAL
+        const READ_API_KEY = '1WJUIXDFNEVTTPYP'; // ⚠️ SUA CHAVE DE LEITURA
+        const URL = `https://api.thingspeak.com/channels/3202067/feeds/last.json?api_key=1WJUIXDFNEVTTPYP`;
         
-        // Mobile menu functionality
-        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-        const closeSidebarBtn = document.getElementById('close-sidebar-btn');
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.getElementById('sidebar-overlay');
+        const LIMITE_RUIDO_PERCENTUAL = 70;
+        let isAlertOpen = false;
 
-        function openSidebar() {
-            sidebar.classList.remove('-translate-x-full');
-            overlay.classList.remove('hidden');
+        // Funções de Utilitário e Alerta
+        function closeAlertModal() {
+            document.getElementById('alert-modal').classList.add('hidden');
+            isAlertOpen = false;
         }
 
-        function closeSidebar() {
-            sidebar.classList.add('-translate-x-full');
-            overlay.classList.add('hidden');
+        function updateStatusClasses(element, removeClasses, addClasses) {
+            if (!element) return;
+            if (removeClasses) {
+                element.classList.remove(...removeClasses.split(' '));
+            }
+            if (addClasses) {
+                element.classList.add(...addClasses.split(' '));
+            }
         }
 
-        mobileMenuBtn.addEventListener('click', openSidebar);
-        closeSidebarBtn.addEventListener('click', closeSidebar);
-        overlay.addEventListener('click', closeSidebar);
+        // Funções do Menu Lateral (Ações)
+        document.addEventListener('DOMContentLoaded', () => {
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const closeSidebarBtn = document.getElementById('close-sidebar-btn');
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
 
-        // Profile menu toggle functionality
+            mobileMenuBtn.addEventListener('click', () => {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+            });
+            closeSidebarBtn.addEventListener('click', () => {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            });
+            overlay.addEventListener('click', () => {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            });
+        });
+
+        // Profile menu toggle functionality (Ações)
         function toggleProfileMenu() {
             const profileMenu = document.getElementById('profile-menu');
             profileMenu.classList.toggle('hidden');
         }
 
-        // Close profile menu when clicking outside
         document.addEventListener('click', function(event) {
             const profileMenu = document.getElementById('profile-menu');
             const profileButton = event.target.closest('[onclick="toggleProfileMenu()"]');
             
-            if (!profileButton && profileMenu && !profileMenu.contains(event.target)) {
+            if (profileMenu && !profileButton && !profileMenu.contains(event.target)) {
                 profileMenu.classList.add('hidden');
             }
         });
-
-
-        // =======================================================
-        // === LÓGICA DE POLLING AJAX (Dados em Tempo Real) ===
-        // =======================================================
         
+        // =======================================================
+        // === FUNÇÃO PRINCIPAL DE LEITURA DO THINGSPEAK ===
+        // =======================================================
         function fetchSensorData() {
-            fetch(ESP32_API_URL) 
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Falha na resposta da API: ' + response.status);
-                    }
-                    return response.json();
+            fetch(URL)
+                .then(res => {
+                    if (!res.ok) throw new Error('Falha na requisição: ' + res.status);
+                    return res.json();
                 })
                 .then(data => {
+                    if(!data || data.field1 === null) {
+                         // Se a resposta for vazia mas OK, ainda mostramos OFFLINE
+                         document.getElementById('cloud-status').textContent = "OFFLINE";
+                         throw new Error("Dados vazios ou nulos recebidos do ThingSpeak.");
+                    }
+
                     const now = new Date();
-
-                    // 1. Nível de Som (%)
-                    const soundValue = (data.sound / 4095 * 100).toFixed(0); 
-                    document.getElementById('sound-value').textContent = soundValue + '%';
+                    document.getElementById('last-update').textContent = now.toLocaleTimeString();
+                    document.getElementById('cloud-status').textContent = "ONLINE";
+                    updateStatusClasses(document.getElementById('cloud-status'), 'text-primary-dark', 'text-success'); // Garante cor verde
                     
-                    const soundStatusElement = document.getElementById('sound-status');
-                    soundStatusElement.classList.remove('text-red-500', 'text-gray-500');
+                    // --- Mapeamento dos Dados ---
+                    const soundRaw = parseInt(data.field1) || 0;
+                    const tempIsNan = data.field2 === "nan" || data.field2 === null; 
+                    const tempVal = tempIsNan ? null : parseFloat(data.field2).toFixed(1);
+                    const isImpact = data.field3 === "1"; 
 
-                    if (soundValue > 70) {
-                         soundStatusElement.innerHTML = '<i class="fa-solid fa-bell animate-pulse mr-1"></i> Ruído Elevado';
-                         soundStatusElement.classList.add('text-red-500');
-                    } else {
-                         soundStatusElement.textContent = 'Nível Normal';
-                         soundStatusElement.classList.add('text-gray-500');
-                    }
+                    // Conversão para Percentual
+                    const soundPerc = Math.min(Math.round((soundRaw / 4095) * 100), 100);
+                    const isLoud = soundPerc > LIMITE_RUIDO_PERCENTUAL;
+
+                    // --- ATUALIZAÇÃO VISUAL ---
+
+                    // 1. Som
+                    document.getElementById('sound-value').textContent = soundPerc + '%';
+                    const soundStatusEl = document.getElementById('sound-status');
+                    soundStatusEl.textContent = isLoud ? 'Ruído Elevado' : 'Nível Normal';
+                    updateStatusClasses(soundStatusEl, isLoud ? 'text-gray-500' : 'text-secondary', isLoud ? 'text-secondary' : 'text-gray-500');
+
+                    // 2. Temperatura (Tratamento de Erro e Alerta)
+                    const tempStatusEl = document.getElementById('temp-status');
+                    const tempCard = document.getElementById('card-temp');
                     
-                    // 2. Temperatura (GY-906)
-                    document.getElementById('temp-value').textContent = data.temp + ' ºC';
-                    const tempStatusElement = document.getElementById('temp-status');
-                    tempStatusElement.classList.remove('text-secondary', 'text-gray-500');
-
-                    if (data.temp > 40.0) { 
-                        tempStatusElement.textContent = 'ALERTA: Temperatura Alta';
-                        tempStatusElement.classList.add('text-secondary');
+                    if (tempIsNan || tempVal === null) {
+                        document.getElementById('temp-value').textContent = '--';
+                        tempStatusEl.textContent = 'Erro de Leitura';
+                        updateStatusClasses(tempStatusEl, 'text-gray-500', 'text-primary-dark');
+                        updateStatusClasses(tempCard, 'ring-2 ring-primary-dark/50', 'border-gray-200'); // Destaca erro
                     } else {
-                        tempStatusElement.textContent = 'Temperatura OK';
-                        tempStatusElement.classList.add('text-gray-500');
+                        document.getElementById('temp-value').textContent = tempVal + ' ºC';
+                        const isHot = tempVal > 40;
+                        tempStatusEl.textContent = isHot ? 'Temperatura ALTA' : 'Temperatura OK';
+                        updateStatusClasses(tempStatusEl, isHot ? 'text-gray-500' : 'text-primary-dark', isHot ? 'text-primary-dark' : 'text-gray-500');
+                        
+                        if(isHot) updateStatusClasses(tempCard, 'border-gray-200', 'ring-2 ring-primary-dark/50');
+                        else updateStatusClasses(tempCard, 'ring-2 ring-primary-dark/50', 'border-gray-200');
                     }
-
 
                     // 3. Impacto
-                    const impactStatus = data.impact ? 'DETECTADO!' : 'Nenhum';
-                    document.getElementById('impact-value').textContent = impactStatus;
-                    
-                    const impactStatusElement = document.getElementById('impact-status');
-                    impactStatusElement.classList.remove('text-secondary', 'text-gray-500');
-                    const impactCard = document.getElementById('impact-value').closest('.bg-white');
+                    const impactStatusEl = document.getElementById('impact-status');
+                    const impactCard = document.getElementById('card-impact');
+                    document.getElementById('impact-value').textContent = isImpact ? 'DETECTADO!' : 'Nenhum';
+                    impactStatusEl.textContent = isImpact ? 'Ação Necessária' : 'Monitorando';
+                    updateStatusClasses(impactStatusEl, isImpact ? 'text-gray-500' : 'text-accent', isImpact ? 'text-accent' : 'text-gray-500');
 
-                    if (data.impact) {
-                        impactStatusElement.textContent = 'Ação Imediata Necessária';
-                        impactStatusElement.classList.add('text-secondary');
-                        impactCard.classList.add('border-red-500', 'ring-2', 'ring-secondary');
-                    } else {
-                        impactStatusElement.textContent = 'Monitorando';
-                        impactStatusElement.classList.add('text-gray-500');
-                        impactCard.classList.remove('border-red-500', 'ring-2', 'ring-secondary');
+                    if(isImpact) updateStatusClasses(impactCard, 'border-gray-200', 'ring-2 ring-accent/50');
+                    else updateStatusClasses(impactCard, 'ring-2 ring-accent/50', 'border-gray-200');
+
+                    // 🚨 4. LÓGICA POPUP 🚨
+                    if (isLoud && isImpact && !isAlertOpen) {
+                        document.getElementById('alert-modal').classList.remove('hidden');
+                        isAlertOpen = true;
                     }
-                    
-                    // 4. Última atualização
-                    document.getElementById('last-update').textContent = now.toLocaleTimeString();
                 })
-                .catch(error => {
-                    console.error('Erro ao buscar dados:', error);
-                    document.getElementById('last-update').textContent = 'FALHA DE CONEXÃO (' + new Date().toLocaleTimeString() + ')';
+                .catch(err => {
+                    console.error("Erro ao buscar do ThingSpeak:", err);
+                    
+                    // Lógica de Falha de Conexão
+                    document.getElementById('cloud-status').textContent = "OFFLINE";
+                    document.getElementById('cloud-status').className = "text-3xl lg:text-4xl font-extrabold text-primary-dark mt-1 lg:mt-2";
+                    document.getElementById('last-update').textContent = 'FALHA (' + new Date().toLocaleTimeString() + ')';
+                    
+                    // Resetar os valores para '--' em caso de erro
+                    document.getElementById('sound-value').textContent = '--';
+                    document.getElementById('temp-value').textContent = '--';
+                    document.getElementById('impact-value').textContent = '--';
+                    document.getElementById('sound-status').textContent = 'Sem Dados';
+                    document.getElementById('temp-status').textContent = 'Sem Dados';
+                    document.getElementById('impact-status').textContent = 'Sem Dados';
                 });
         }
 
         // Inicia o Polling
-        document.addEventListener('DOMContentLoaded', function () {
-            fetchSensorData(); // Chama a função imediatamente
-            setInterval(fetchSensorData, 2000); // Chama a função a cada 2000 ms (2 segundos)
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchSensorData();
+            setInterval(fetchSensorData, 5000); 
         });
     </script>
-
 </body>
-
 </html>
-
